@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDC401k — Coming Soon</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --acid-yellow: #F5FF40;
+    --hot-coral: #FF4D6D;
+    --electric-cyan: #00F5FF;
+    --deep-violet: #1A0A3C;
+    --neon-green: #39FF14;
+    --lavender: #C77DFF;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--deep-violet);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    min-height: 100vh;
+    cursor: crosshair;
+  }
+
+  /* ── Animated mesh background ── */
+  .bg {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(199,125,255,.35) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 70% at 90% 80%, rgba(0,245,255,.25) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255,77,109,.2) 0%, transparent 60%),
+      var(--deep-violet);
+    animation: bgShift 12s ease-in-out infinite alternate;
+  }
+  @keyframes bgShift {
+    0%   { filter: hue-rotate(0deg)   brightness(1); }
+    50%  { filter: hue-rotate(20deg)  brightness(1.08); }
+    100% { filter: hue-rotate(-15deg) brightness(.95); }
+  }
+
+  /* ── Grid overlay ── */
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* ── Floating orbs ── */
+  .orb {
+    position: fixed; border-radius: 50%; filter: blur(80px);
+    pointer-events: none; z-index: 1; opacity: .55;
+  }
+  .orb-1 { width: 500px; height: 500px; background: var(--hot-coral);   top: -150px; left: -100px; animation: float1 18s ease-in-out infinite; }
+  .orb-2 { width: 400px; height: 400px; background: var(--electric-cyan); bottom: -100px; right: -80px; animation: float2 14s ease-in-out infinite; }
+  .orb-3 { width: 300px; height: 300px; background: var(--acid-yellow);  top: 40%; left: 60%; animation: float3 20s ease-in-out infinite; }
+  @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(60px,40px) scale(1.1); } }
+  @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-50px,-30px) scale(1.05); } }
+  @keyframes float3 { 0%,100% { transform: translate(0,0); } 33% { transform: translate(30px,-40px); } 66% { transform: translate(-30px,20px); } }
+
+  /* ── Ticker tape ── */
+  .ticker-wrap {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    background: var(--acid-yellow); height: 36px;
+    overflow: hidden; display: flex; align-items: center;
+  }
+  .ticker-track {
+    display: flex; gap: 0; white-space: nowrap;
+    animation: ticker 22s linear infinite;
+  }
+  .ticker-item {
+    font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+    color: var(--deep-violet); padding: 0 28px; letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .ticker-dot { color: var(--hot-coral); padding: 0 4px; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ── Main layout ── */
+  .stage {
+    position: relative; z-index: 5;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 80px 24px 60px;
+    gap: 0;
+  }
+
+  /* ── Corner badges ── */
+  .corner-badge {
+    position: fixed; z-index: 20;
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: rgba(255,255,255,.4);
+  }
+  .corner-tl { top: 48px; left: 24px; }
+  .corner-tr { top: 48px; right: 24px; text-align: right; }
+
+  /* ── Tag line ── */
+  .tag {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 100px; padding: 8px 20px; margin-bottom: 40px;
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--electric-cyan);
+    backdrop-filter: blur(8px);
+    animation: fadeUp .8s ease both;
+  }
+  .tag-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neon-green); animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+
+  /* ── Hero heading ── */
+  .hero-heading {
+    text-align: center;
+    animation: fadeUp .9s .1s ease both;
+    margin-bottom: 10px;
+  }
+  .hero-label {
+    font-family: 'Space Mono', monospace; font-size: 13px;
+    letter-spacing: .25em; text-transform: uppercase;
+    color: rgba(255,255,255,.45); margin-bottom: 18px; display: block;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(72px, 16vw, 160px);
+    line-height: .9; color: #fff;
+    letter-spacing: -.03em;
+    text-shadow: 0 0 80px rgba(199,125,255,.6), 0 0 160px rgba(0,245,255,.3);
+  }
+  .hero-title .highlight {
+    background: linear-gradient(135deg, var(--acid-yellow) 0%, var(--hot-coral) 50%, var(--lavender) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(245,255,64,.5));
+  }
+
+  /* ── Sub heading ── */
+  .hero-sub {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: clamp(24px, 4vw, 42px);
+    color: rgba(255,255,255,.85); letter-spacing: -.01em;
+    text-align: center; margin-top: 20px; margin-bottom: 16px;
+    animation: fadeUp 1s .2s ease both;
+  }
+
+  /* ── Description ── */
+  .hero-desc {
+    font-family: 'Space Mono', monospace; font-size: 14px;
+    color: rgba(255,255,255,.5); text-align: center; line-height: 1.9;
+    max-width: 520px; margin-bottom: 60px;
+    animation: fadeUp 1s .3s ease both;
+  }
+
+  /* ── Color bar ── */
+  .color-bar {
+    width: 100%; max-width: 620px; height: 4px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--hot-coral), var(--acid-yellow), var(--neon-green), var(--electric-cyan), var(--lavender), var(--hot-coral));
+    background-size: 200%;
+    animation: barSlide 4s linear infinite, fadeUp 1s .35s ease both;
+    margin-bottom: 60px;
+  }
+  @keyframes barSlide { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
+
+  /* ── Feature pills ── */
+  .features {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    max-width: 680px; margin-bottom: 70px;
+    animation: fadeUp 1s .4s ease both;
+  }
+  .pill {
+    display: flex; align-items: center; gap: 9px;
+    padding: 10px 20px; border-radius: 100px;
+    font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.12);
+    color: #fff; transition: transform .2s, box-shadow .2s;
+  }
+  .pill:hover { transform: translateY(-3px); }
+  .pill-1 { background: rgba(255,77,109,.18); border-color: rgba(255,77,109,.4); box-shadow: 0 0 24px rgba(255,77,109,.15); }
+  .pill-1:hover { box-shadow: 0 0 40px rgba(255,77,109,.4); }
+  .pill-2 { background: rgba(0,245,255,.12); border-color: rgba(0,245,255,.35); box-shadow: 0 0 24px rgba(0,245,255,.1); }
+  .pill-2:hover { box-shadow: 0 0 40px rgba(0,245,255,.35); }
+  .pill-3 { background: rgba(57,255,20,.12); border-color: rgba(57,255,20,.35); box-shadow: 0 0 24px rgba(57,255,20,.1); }
+  .pill-3:hover { box-shadow: 0 0 40px rgba(57,255,20,.3); }
+  .pill-4 { background: rgba(245,255,64,.12); border-color: rgba(245,255,64,.35); box-shadow: 0 0 24px rgba(245,255,64,.1); }
+  .pill-4:hover { box-shadow: 0 0 40px rgba(245,255,64,.35); }
+  .pill-5 { background: rgba(199,125,255,.15); border-color: rgba(199,125,255,.4); box-shadow: 0 0 24px rgba(199,125,255,.1); }
+  .pill-5:hover { box-shadow: 0 0 40px rgba(199,125,255,.35); }
+  .pill-icon { font-size: 15px; }
+
+  /* ── Email signup ── */
+  .signup {
+    display: flex; gap: 0; max-width: 480px; width: 100%;
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 0 60px rgba(199,125,255,.25), 0 0 0 1px rgba(255,255,255,.1);
+    animation: fadeUp 1s .5s ease both;
+    margin-bottom: 32px;
+  }
+  .signup input {
+    flex: 1; padding: 18px 22px; background: rgba(255,255,255,.07);
+    border: none; outline: none; font-family: 'Space Mono', monospace;
+    font-size: 13px; color: #fff; backdrop-filter: blur(12px);
+  }
+  .signup input::placeholder { color: rgba(255,255,255,.3); }
+  .signup button {
+    padding: 18px 28px; background: linear-gradient(135deg, var(--hot-coral), var(--lavender));
+    border: none; cursor: pointer; font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 13px; letter-spacing: .08em;
+    color: #fff; text-transform: uppercase; white-space: nowrap;
+    transition: filter .2s, transform .1s;
+  }
+  .signup button:hover { filter: brightness(1.15); }
+  .signup button:active { transform: scale(.98); }
+
+  .signup-note {
+    font-size: 11px; color: rgba(255,255,255,.3); letter-spacing: .1em;
+    text-align: center; text-transform: uppercase;
+    animation: fadeUp 1s .6s ease both;
+  }
+
+  /* ── Bottom divider and footer ── */
+  .divider {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, rgba(255,255,255,.2), transparent);
+    margin: 50px auto 0;
+    animation: fadeUp 1s .7s ease both;
+  }
+
+  .footer {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+    padding: 16px 32px; display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to top, rgba(26,10,60,.9), transparent);
+  }
+  .footer-left {
+    font-size: 11px; letter-spacing: .15em; color: rgba(255,255,255,.3); text-transform: uppercase;
+  }
+  .footer-right {
+    display: flex; gap: 24px;
+  }
+  .footer-link {
+    font-size: 11px; letter-spacing: .12em; color: rgba(255,255,255,.3);
+    text-transform: uppercase; text-decoration: none; transition: color .2s;
+  }
+  .footer-link:hover { color: var(--electric-cyan); }
+
+  /* ── Countdown ── */
+  .countdown {
+    display: flex; gap: 24px; margin-bottom: 60px;
+    animation: fadeUp 1s .38s ease both;
+  }
+  .count-block {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .count-num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(36px, 6vw, 56px); color: #fff; line-height: 1;
+    min-width: 80px; text-align: center;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px; padding: 14px 10px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .count-label {
+    font-size: 9px; letter-spacing: .2em; color: rgba(255,255,255,.35); text-transform: uppercase;
+  }
+  .count-sep {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 40px; color: rgba(255,255,255,.2); align-self: flex-start; margin-top: 14px;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Scanline effect ── */
+  .scanlines {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,.03) 3px, rgba(0,0,0,.03) 4px
+    );
+  }
+
+  /* ── Noise grain ── */
+  .noise {
+    position: fixed; inset: 0; z-index: 3; pointer-events: none; opacity: .04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    animation: grainShift 0.4s steps(1) infinite;
+  }
+  @keyframes grainShift {
+    0%  { transform: translate(0,0); }
+    25% { transform: translate(-2px, 1px); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(-1px, 2px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- BG layers -->
+<div class="bg"></div>
+<div class="grid-overlay"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="scanlines"></div>
+<div class="noise"></div>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker"></div>
+</div>
+
+<!-- Corner badges -->
+<div class="corner-badge corner-tl">PDC401k<br>v0.1.0</div>
+<div class="corner-badge corner-tr">Experimental<br>AI System</div>
+
+<!-- Main stage -->
+<div class="stage">
+
+  <!-- Status tag -->
+  <div class="tag">
+    <span class="tag-dot"></span>
+    Currently in stealth development
+  </div>
+
+  <!-- Hero -->
+  <div class="hero-heading">
+    <span class="hero-label">Experimental AI Project</span>
+    <h1 class="hero-title"><span class="highlight">PDC</span><br>401k</h1>
+  </div>
+
+  <p class="hero-sub">The future of retirement intelligence</p>
+  <p class="hero-desc">
+    An experimental AI system reimagining how employees understand,<br>
+    optimize, and interact with their retirement portfolios.
+  </p>
+
+  <div class="color-bar"></div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="pill pill-1"><span class="pill-icon">⚡</span> AI-Driven Insights</div>
+    <div class="pill pill-2"><span class="pill-icon">🔮</span> Predictive Modeling</div>
+    <div class="pill pill-3"><span class="pill-icon">🛡️</span> Risk Intelligence</div>
+    <div class="pill pill-4"><span class="pill-icon">📊</span> Portfolio Optimizer</div>
+    <div class="pill pill-5"><span class="pill-icon">🤖</span> Natural Language Q&A</div>
+  </div>
+
+  <!-- Countdown -->
+  <div class="countdown">
+    <div class="count-block">
+      <div class="count-num" id="days">--</div>
+      <div class="count-label">Days</div>
+    </div>
+    <div class="count-sep">:</div>
+    <div class="count-block">
+      <div class="count-num" id="hours">--</div>
+      <div class="count-label">Hours</div>
+    </div>
+    <div class="count-sep">:</div>
+    <div class="count-block">
+      <div class="count-num" id="mins">--</div>
+      <div class="count-label">Mins</div>
+    </div>
+    <div class="count-sep">:</div>
+    <div class="count-block">
+      <div class="count-num" id="secs">--</div>
+      <div class="count-label">Secs</div>
+    </div>
+  </div>
+
+  <!-- Email signup -->
+  <div class="signup">
+    <input type="email" placeholder="your@email.com" id="email-input">
+    <button onclick="handleSignup()">Notify me</button>
+  </div>
+  <p class="signup-note">Be first to access &nbsp;·&nbsp; No spam, ever</p>
+
+  <div class="divider"></div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-left">© 2026 PDC401k — Experimental</div>
+  <div class="footer-right">
+    <a href="#" class="footer-link">Privacy</a>
+    <a href="#" class="footer-link">Contact</a>
+    <a href="#" class="footer-link">GitHub</a>
+  </div>
+</div>
+
+<script>
+  // Countdown to launch
+  const launch = new Date('2026-09-01T00:00:00');
+  function tick() {
+    const now = new Date();
+    const diff = launch - now;
+    if (diff <= 0) { return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('days').textContent  = String(d).padStart(2,'0');
+    document.getElementById('hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('mins').textContent  = String(m).padStart(2,'0');
+    document.getElementById('secs').textContent  = String(s).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 1000);
+
+  // Ticker
+  const msgs = [
+    'PDC401k', '◆', 'Coming Soon', '◆', 'AI-Powered Retirement', '◆',
+    'Experimental Build', '◆', 'Join the Waitlist', '◆', 'The Future of 401k', '◆',
+    'PDC401k', '◆', 'Launching 2026', '◆', 'Stealth Mode', '◆',
+  ];
+  const track = document.getElementById('ticker');
+  const full = [...msgs, ...msgs];
+  track.innerHTML = full.map(m => `<span class="ticker-item">${m}</span>`).join('');
+
+  // Email signup
+  function handleSignup() {
+    const input = document.getElementById('email-input');
+    const btn = document.querySelector('.signup button');
+    if (input.value && input.value.includes('@')) {
+      btn.textContent = '✓ You\'re in!';
+      btn.style.background = 'linear-gradient(135deg, #39FF14, #00F5FF)';
+      btn.style.color = '#1A0A3C';
+      input.value = '';
+      input.placeholder = 'See you on the other side 🚀';
+    } else {
+      input.style.background = 'rgba(255,77,109,.15)';
+      input.placeholder = 'Enter a valid email...';
+      setTimeout(() => { input.style.background = ''; }, 800);
+    }
+  }
+  document.getElementById('email-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSignup();
+  });
+
+  // Subtle cursor glow
+  const glow = document.createElement('div');
+  Object.assign(glow.style, {
+    position: 'fixed', width: '300px', height: '300px',
+    borderRadius: '50%', pointerEvents: 'none', zIndex: '4',
+    background: 'radial-gradient(circle, rgba(199,125,255,.08) 0%, transparent 70%)',
+    transform: 'translate(-50%,-50%)', transition: 'left .12s, top .12s',
+  });
+  document.body.appendChild(glow);
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top  = e.clientY + 'px';
+  });
+</script>
+</body>
+</html>
